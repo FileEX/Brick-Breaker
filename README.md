@@ -31,7 +31,7 @@ The game involves bouncing a ball with a paddle and destroying blocks. A power-u
 ### Controls
 - The paddle is moved by moving the mouse left and right.
 - If you've collected a weapon power-up, use the right mouse button (RMB) to shoot.
-- If you've lost all your lives or completed the help section, press the spacebar to continue.
+- If you've lost all your lives or completed the level, press the spacebar to continue.
 
 ## Level generation
 Levels are generated based on an image called ``template.png``. This is a simple template that contains a level visualization. Each block is represented by a 2-pixel green (0, 255, 0) border/stroke. In the file **CBricks.cpp**, set **LEVELS_DEBUG_ACTIVE** to **true**, and then run the game. Once the game starts, you can close it. A file named ``level_gen.dat`` will be generated in the main directory. Move it to the ``data/`` directory and rename it to ``level_x.dat``, where ``x`` represents the next number. After generating the file, set **LEVELS_DEBUG_ACTIVE** back to **false**. An example ``template.png`` file can be found [here](https://github.com/FileEX/Brick-Breaker/blob/main/template.png).
