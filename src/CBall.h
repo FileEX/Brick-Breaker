@@ -23,6 +23,8 @@ public:
 
 	void SetScale(float scale);
 
+	void SetOnFire(bool onFire);
+
 	void Process(float dt, bool gamePaused);
 
 private:
@@ -38,6 +40,8 @@ private:
 	sf::Vector2f m_velocity{};
 	sf::Vector2f m_spriteStartSpeed{};
 
+	sf::Color m_ballColor{ 255, 255, 255 };
+
 	float m_ballSize{ 0.0f };
 	float m_ballRadius{ 0.0f };
 	float m_scale{ 1.0f };
@@ -47,6 +51,7 @@ private:
 	bool m_shot{ false };
 	bool m_glued{ false };
 	bool m_markedForDeletion{ false };
+	bool m_isOnFire{ false };
 
 	std::deque<sf::Vector2f> m_trailPositions;
 };

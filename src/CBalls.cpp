@@ -33,6 +33,13 @@ void CBalls::SetBallScale(float scale) const
 		ball->SetScale(scale);
 }
 
+void CBalls::SetBallOnFire(bool onFire) const
+{
+	for (std::size_t i = 0; i < MAX_FIRE_BALLS; i++)
+		if (i < m_balls.size())
+			m_balls[i]->SetOnFire(onFire);
+}
+
 void CBalls::RemoveBalls() const noexcept
 {
 	for (const auto& ball : m_balls)

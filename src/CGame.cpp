@@ -31,10 +31,9 @@ void CGame::Start()
 	// Create 'main' ball
 	m_balls->CreateBall();
 
-	m_bgSprite = m_resourceManager->GetSprite("bg").get();
-
-	const sf::FloatRect& bounds = m_bgSprite->getGlobalBounds();
-	m_bgSprite->setScale((1.0f / bounds.width) * m_gameWindow->getSize().x, (1.0f / bounds.height) * m_gameWindow->getSize().y);
+	// Load level 1
+	// TODO load level from save file
+	m_levelManager->LoadLevel(1u);
 
 	const sf::Font* arialFont = m_hud->GetFont();
 	if (!arialFont)
@@ -72,11 +71,22 @@ void CGame::Start()
 		{
 			if (event.type == sf::Event::Closed)
 			{
-				m_audio->StopAll();
+				Shutdown();
 				m_gameWindow->close();
 			}
 		}
 	}
+}
+
+void CGame::Shutdown() const noexcept
+{
+	m_audio->StopAll();
+	m_balls->Shutdown();
+	m_bullets->Shutdown();
+	m_bricks->Shutdown();
+	m_powerups->Shutdown();
+	m_particleSystem->Shutdown();
+	m_resourceManager->Shutdown();
 }
 
 void CGame::Process()
@@ -90,7 +100,7 @@ void CGame::Process()
 	m_gameWindow->clear();
 
 	// Draw background
-	m_gameWindow->draw(*m_bgSprite);
+	m_levelManager->PreProcess();
 
 	// Draw paddle
 	m_paddle->Process(gamePaused);

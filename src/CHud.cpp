@@ -32,17 +32,22 @@ CHud::CHud(sf::RenderWindow* gameWindow) : m_gameWindow(gameWindow)
 		}
 	}
 
+	const sf::Vector2f& gameScale = GetScreenScale();
+
 	// Create hearts
 	for (std::uint8_t i = 0; i < m_heartsSprite.size(); i++)
 	{
-		const sf::Vector2f& gameScale = GetScreenScale();
-
 		m_heartsSprite[i] = sf::Sprite(*g_pGame->GetResourceManager()->GetTexture("heart"));
 		m_heartsSprite[i].setScale(gameScale.x * 0.5f, gameScale.y * 0.5f);
 
 		const sf::FloatRect& bounds = m_heartsSprite[i].getGlobalBounds();
 		m_heartsSprite[i].setPosition(30.0f * wallScale + (bounds.width + 20.0f * wallScale) * i, wallsY / 2.0f - bounds.height / 2.0f);
 	}
+
+	// Calc powerups position
+	std::size_t lastHeart = m_heartsSprite.size() - 1;
+	const sf::FloatRect& bounds = m_heartsSprite[lastHeart].getGlobalBounds();
+	m_powerupsPos = sf::Vector2f(m_heartsSprite[lastHeart].getPosition().x + bounds.width + 30.0f * gameScale.y, m_heartsSprite[lastHeart].getPosition().y + bounds.height / 2.0f);
 
 	// Create score text
 	m_fontLoaded = m_arialFont.loadFromFile("data/arial.ttf");
@@ -97,16 +102,16 @@ void CHud::ScaleSprite(sf::Sprite& sprite, bool keepRatio) const
 
 void CHud::TakeLife()
 {
+	if (g_pGame->GetLevelManager()->GetLevelStatus() != eLevelStatus::PLAYING)
+		return;
+
 	if (m_lifes > 0)
 		m_lifes--;
 
 	g_pGame->GetAudio()->PlaySFX("lost_ball");
 
 	if (m_lifes <= 0)
-	{
 		g_pGame->GetLevelManager()->SetLevelStatus(eLevelStatus::FAIL);
-		return;
-	}
 }
 
 void CHud::AddScore(std::uint8_t score)
@@ -130,6 +135,27 @@ void CHud::Reset(std::uint8_t level)
 	m_scoreText.setString("Score: " + std::to_string(m_score));
 }
 
+void CHud::Update() const
+{
+	const auto& powerups = g_pGame->GetPowerups()->GetActivePowerups();
+	const sf::Vector2f& gameScale = GetScreenScale();
+	for (std::size_t i = 0; i < powerups.size(); ++i)
+	{
+		sf::Sprite* sprite = powerups[i]->GetSprite();
+		sf::Text* text = powerups[i]->GetText();
+
+		sprite->setScale(0.75f, 0.75f);
+
+		const sf::FloatRect& bounds = sprite->getGlobalBounds();
+		const sf::FloatRect& textBounds = text->getGlobalBounds();
+
+		float x = m_powerupsPos.x + (bounds.width + 20.0f * gameScale.y) * i;
+		float y = m_powerupsPos.y - bounds.height / 2.0f;
+		sprite->setPosition(x, y - 7.0f * gameScale.y);
+		text->setPosition(x + bounds.width / 2.0f - textBounds.width / 2.0f, y + bounds.height - 3.0f * gameScale.y);
+	}
+}
+
 void CHud::Process() const
 {
 	// Draw lifes
@@ -139,6 +165,17 @@ void CHud::Process() const
 	// Draw walls
 	for (std::uint8_t i = 0; i < 3; i++)
 		m_gameWindow->draw(m_wallsSprite[i]);
+
+	// Draw powereups
+	const auto& powerups = g_pGame->GetPowerups()->GetActivePowerups();
+	for (std::size_t i = 0; i < powerups.size(); ++i)
+	{
+		sf::Sprite* sprite = powerups[i]->GetSprite();
+		sf::Text* text = powerups[i]->GetText();
+
+		m_gameWindow->draw(*sprite);
+		m_gameWindow->draw(*text);
+	}
 
 	// Draw score & level
 	m_gameWindow->draw(m_scoreText);

@@ -17,19 +17,32 @@ void CPowerups::RemovePowerups() const noexcept
 	}
 }
 
-CPowerup* CPowerups::GetPowerupByType(const ePowerupType& type, CPowerup* ignore) const noexcept
+CPowerup* CPowerups::GetActivePowerupByType(const ePowerupType& type, CPowerup* ignore) const noexcept
 {
 	for (const auto& powerup : m_powerups)
 		if (powerup->GetType() == type && powerup.get() != ignore)
-			return powerup.get();
+			if (powerup->IsActive() && !powerup->IsDrawable())
+				return powerup.get();
 
 	return nullptr;
 }
 
+std::vector<CPowerup*> CPowerups::GetActivePowerups() const
+{
+	std::vector<CPowerup*> activeList{};
+	activeList.reserve(m_powerups.size());
+
+	for (const auto& powerup : m_powerups)
+		if (powerup->IsActive() && !powerup->IsDrawable() && !powerup->IsTimeless())
+			activeList.push_back(powerup.get());
+
+	return activeList;
+}
+
 bool CPowerups::DisablePowerupIfActive(const ePowerupType& type) const
 {
-	CPowerup* pwp = GetPowerupByType(type);
-	if (!pwp || !pwp->IsActive() || pwp->IsDrawable())
+	CPowerup* pwp = GetActivePowerupByType(type);
+	if (!pwp)
 		return false;
 
 	pwp->Toggle(false);

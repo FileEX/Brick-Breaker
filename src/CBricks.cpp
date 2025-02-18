@@ -3,7 +3,7 @@
 #include "CGame.h"
 #include "fstream"
 
-#define LEVELS_DEBUG_ACTIVE false
+#define LEVELS_DEBUG_ACTIVE true
 
 extern CGame* g_pGame;
 
@@ -36,14 +36,20 @@ void CBricks::CreateBricks()
 		std::istringstream lineStream(line);
 
 		float x, y;
-		int hitsToDestroy;
+		std::uint16_t hitsToDestroy;
+		std::uint32_t r, g, b;
+		bool useImageColors;
 		char separator;
 
-		if (!(lineStream >> x >> separator >> y >> separator >> hitsToDestroy))
+		if (!(lineStream >> x >> separator >> y >> separator >> hitsToDestroy >> separator >> r >> separator >> g >> separator >> b >> separator >> useImageColors))
 			continue;
 
 		auto brick = std::make_unique<CBrick>(m_gameWindow);
 		brick->SetPosition(bricksSpace.x + x * scale.x, bricksSpace.y + y * scale.y);
+		brick->SetMaxHitsToDestroy(hitsToDestroy);
+
+		if (useImageColors)
+			brick->SetColor(r, g, b);
 
 		m_bricksList.push_back(std::move(brick));
 	}
@@ -92,8 +98,13 @@ void CBricks::Process() noexcept
 	m_bricksList.erase(std::remove_if(m_bricksList.begin(), m_bricksList.end(), process), m_bricksList.end());
 }
 
-int CBricks::GetBrickHealthFromColor(const sf::Color& color) const
+int CBricks::GetHitsToDestroyFromColor(const sf::Color& color) const noexcept
 {
+	if (color == sf::Color::Magenta)
+		return 1;
+	else if (color == sf::Color::Blue)
+		return 255;
+
 	return 4;
 }
 
@@ -111,6 +122,8 @@ void CBricks::GenerateLevelFileFromTemplate() const
 	if (!levelFile.is_open())
 		return;
 
+	bool useRandomColors = image.getPixel(0, 0) != sf::Color::Yellow;
+
 	for (std::uint32_t y = 0; y < imageSize.y; ++y)
 	{
 		for (std::uint32_t x = 0; x < imageSize.x; ++x)
@@ -118,7 +131,9 @@ void CBricks::GenerateLevelFileFromTemplate() const
 			const sf::Color& pixelColor = image.getPixel(x, y);
 			if (pixelColor == sf::Color::Green)
 			{
-				levelFile << x * scale.x << ", " << y * scale.y << ", " << GetBrickHealthFromColor(image.getPixel(x + 2, y + 2)) << "\n";
+				const sf::Color& brickColor = useRandomColors ? sf::Color::Black : image.getPixel(x + 5, y + 5);
+
+				levelFile << x * scale.x << ", " << y * scale.y << ", " << GetHitsToDestroyFromColor(image.getPixel(x + 2, y + 2)) << ", " << static_cast<std::uint32_t>(brickColor.r) << ", " << static_cast<std::uint32_t>(brickColor.g) << ", " << static_cast<std::uint32_t>(brickColor.b) << ", " << (useRandomColors ? "0" : "1") << "\n";
 				x += static_cast<std::uint32_t>(brickSize.x - 1);
 			}
 		}
