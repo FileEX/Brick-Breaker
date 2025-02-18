@@ -16,10 +16,6 @@ enum class ePowerupType
 	GLUE,
 	GUN,
 	SKIP_LEVEL,
-	FREEZE,
-	SHIELD,
-	INVERTED_CONTROL,
-	FIRE_BALL,
 
 	MAX_POWERUPS,
 };
@@ -31,14 +27,12 @@ public:
 
 	const ePowerupType& GetType() const noexcept { return m_type; }
 	sf::Sprite* GetSprite() const noexcept { return m_sprite.get(); }
-	sf::Text* GetText() const noexcept { return m_timeText.get(); }
 
 	void MarkForDeletion() noexcept { m_isActive = false; }
 	bool IsActive() const noexcept { return m_isActive; }
 	bool IsDrawable() const noexcept { return m_draw; }
-	bool IsTimeless() const noexcept;
 
-	void ResetLifeTime() { m_clock.restart(); m_lifeTime = 15; }
+	void ResetLifeTime() { m_clock.restart(); }
 
 	void Toggle(bool activate);
 	void Process(bool gamePaused);
@@ -53,15 +47,12 @@ private:
 	std::unique_ptr<sf::Sprite> m_sprite;
 
 	ePowerupType m_type{ ePowerupType::UNKNOWN };
-	ePowerupType m_lastPowerup{ ePowerupType::UNKNOWN };
 
 	bool m_isActive{ true };
 	bool m_draw{ true };
 	bool m_sound{ true };
 
 	sf::Clock m_clock;
-
-	std::unique_ptr<sf::Text> m_timeText;
 
 	int m_lifeTime{ 15 };
 };

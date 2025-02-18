@@ -14,9 +14,6 @@ CLevelManager::CLevelManager(sf::RenderWindow* gameWindow) : m_gameWindow(gameWi
 
 	m_bigText.setPosition(0, gameSize.y / 2.0f - m_bigText.getGlobalBounds().height - 20 * scale.y);
 	m_subText.setPosition(0, gameSize.y / 2.0f + m_subText.getGlobalBounds().height + 20 * scale.y);
-
-	const SScreenSpace& bricksSpace = g_pGame->GetHud()->GetSpaceForBricks();
-	m_levelBackground.setPosition(bricksSpace.x, bricksSpace.y);
 }
 
 void CLevelManager::SetLevelStatus(const eLevelStatus& status)
@@ -46,28 +43,11 @@ void CLevelManager::SetLevelStatus(const eLevelStatus& status)
 	}
 }
 
-void CLevelManager::LoadLevel(std::uint8_t level)
+void CLevelManager::LoadLevel()
 {
-	bool sameLevel = m_level != level;
-	m_level = level;
-	
-	g_pGame->GetAudio()->ResetMusic(m_initalized ? sameLevel : true);
-
-	ResetLevel();
-
-	if (std::filesystem::exists("textures/levels/bg_level_" + std::to_string(m_level) + ".jpg"))
-	{
-		m_levelBackground.setTexture(*g_pGame->GetResourceManager()->GetTexture("bg_level_" + std::to_string(m_level)), true);
-
-		const sf::Vector2f& bounds = static_cast<sf::Vector2f>(m_levelBackground.getTexture()->getSize());
-		const SScreenSpace& bricksSpace = g_pGame->GetHud()->GetSpaceForBricks();
-
-		float spaceHeight = m_gameWindow->getSize().y - bricksSpace.y;
-		m_levelBackground.setScale((1.0f / bounds.x) * bricksSpace.width, (1.0f / bounds.y) * spaceHeight);
-	}
-
-	if (!m_initalized)
-		m_initalized = true;
+	// TODO load level from save file
+	m_level = 1;
+	g_pGame->GetHud()->SetLevel(m_level);
 }
 
 void CLevelManager::ResetLevel()
@@ -80,7 +60,6 @@ void CLevelManager::ResetLevel()
 
 	// Reset paddle scale
 	g_pGame->GetPaddle()->UpdateScale(g_pGame->GetPaddle()->GetScale());
-	g_pGame->GetPaddle()->Freeze(false);
 
 	g_pGame->GetBullets()->RemoveBullets();
 	g_pGame->GetPowerups()->RemovePowerups();
@@ -94,11 +73,6 @@ void CLevelManager::ResetLevel()
 
 	g_pGame->Resume();
 	m_status = eLevelStatus::PLAYING;
-}
-
-void CLevelManager::PreProcess() const
-{
-	m_gameWindow->draw(m_levelBackground);
 }
 
 void CLevelManager::Process(bool gamePaused)
@@ -122,12 +96,12 @@ void CLevelManager::Process(bool gamePaused)
 			ResetLevel();
 		else if (m_status == eLevelStatus::SUCCESS)
 		{
-			std::uint8_t nextLevel = m_level + 1;
+			m_level++;
 
-			if (!std::filesystem::exists("data/level_" + std::to_string(nextLevel) + ".dat"))
-				nextLevel = 1;
+			if (!std::filesystem::exists("data/level_" + std::to_string(m_level) + ".dat"))
+				m_level = 1;
 
-			LoadLevel(nextLevel);
+			ResetLevel();
 		}
 	}
 }

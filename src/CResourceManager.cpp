@@ -3,7 +3,7 @@
 
 extern CGame* g_pGame;
 
-static const std::array<std::string, 2> staticTextures = {"paddle", "wall"};
+static const std::array<std::string, 3> staticTextures = {"paddle", "wall", "bg"};
 
 CResourceManager::CResourceManager()
 {
@@ -11,7 +11,6 @@ CResourceManager::CResourceManager()
 		LoadDataBuffer<sf::Texture>("textures", ".png", m_texturesMap);
 		LoadDataBuffer<sf::SoundBuffer>("sfx", ".wav", m_soundsBuffer);
 		LoadDataBuffer<sf::Texture>("textures/powerups", ".png", m_texturesMap);
-		LoadDataBuffer<sf::Texture>("textures/levels", ".jpg", m_texturesMap);
 
 		CreateSprites();
 	}

@@ -61,7 +61,6 @@ void CBall::Restart() noexcept
 
 	g_pGame->GetPowerups()->DisablePowerupIfActive(ePowerupType::SLOW_BALL);
 	g_pGame->GetPowerups()->DisablePowerupIfActive(ePowerupType::FAST_BALL);
-	g_pGame->GetPowerups()->DisablePowerupIfActive(ePowerupType::FIRE_BALL);
 
 	m_trailPositions.clear();
 }
@@ -103,15 +102,6 @@ bool CBall::KeepBallInScreenBounds(sf::Vector2f& ballPosition)
 			MarkForDeletion();
 		else
 		{
-			CPowerup* shield = g_pGame->GetPowerups()->GetActivePowerupByType(ePowerupType::SHIELD);
-			if (shield)
-			{
-				Restart();
-				g_pGame->GetAudio()->PlaySFX("shield");
-
-				return false;
-			}
-
 			g_pGame->GetHud()->TakeLife();
 
 			if (g_pGame->GetHud()->GetLifes() > 0)
@@ -151,14 +141,6 @@ void CBall::SetScale(float scale)
 	m_ballSize = m_sprite->getGlobalBounds().height;
 	m_ballRadius = m_ballSize / 2.0f;
 	m_gluedOffset = m_paddle->GetGlobalBounds().width / 2.0f - m_ballRadius;
-}
-
-void CBall::SetOnFire(bool onFire)
-{
-	m_ballColor = onFire ? sf::Color(255, 115, 0) : sf::Color(255, 255, 255);
-	m_sprite->setColor(m_ballColor);
-	
-	m_isOnFire = onFire;
 }
 
 void CBall::Process(float dt, bool gamePaused)
@@ -211,9 +193,6 @@ void CBall::Process(float dt, bool gamePaused)
 
 		for (const auto& brick : m_bricks->GetBricks())
 		{
-			if (!brick || brick->ShouldRemove())
-				continue;
-
 			const sf::FloatRect& brickBounds = brick->GetGlobalBounds();
 
 			if (ballBounds.intersects(brickBounds))
@@ -241,12 +220,7 @@ void CBall::Process(float dt, bool gamePaused)
 				}
 
 				m_sprite->setPosition(ballPos);
-
-				if (m_isOnFire)
-					brick->Explode();
-				else
-					brick->Hit();
-
+				brick->Hit();
 				break;
 			}
 		}
@@ -294,9 +268,6 @@ void CBall::ProcessTrailEffect()
 		trail.setOrigin(size, size);
 		trail.setFillColor(sf::Color(255, 255, 255, static_cast<sf::Uint8>(alpha)));
 		trail.setPosition(m_trailPositions[i]);
-
-		if (m_isOnFire)
-			trail.setFillColor(sf::Color(m_ballColor.r, m_ballColor.g, m_ballColor.b, alpha));
 
 		m_gameWindow->draw(trail);
 	}

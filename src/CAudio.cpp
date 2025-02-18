@@ -18,30 +18,24 @@ void CAudio::PlaySFX(const std::string& name)
 
 void CAudio::PlayMusic()
 {
-	std::string path = "music/" + std::to_string(g_pGame->GetLevelManager()->GetLevel()) + ".ogg";
-	if (std::filesystem::exists(path))
+	std::uint8_t random = (std::rand() % numSongs) + 1;
+	if (m_currentMusicID > 0 && random == m_currentMusicID)
 	{
-		if (!m_music.openFromFile(path))
-		{
-			g_pGame->SetErrorStatus("Cannot open " + path + " file");
-			return;
-		}
+		PlayMusic();
+		return;
 	}
 
-	m_music.setLoop(true);
+	std::string path = "music/" + std::to_string(random) + ".ogg";
+	if (!m_music.openFromFile(path))
+	{
+		g_pGame->SetErrorStatus("Cannot open " + path + " file");
+		return;
+	}
+
+	m_currentMusicID = random;
+
 	m_music.setVolume(50.0f);
 	m_music.play();
-}
-
-void CAudio::ResetMusic(bool newLevel)
-{
-	m_music.setPlayingOffset(sf::Time::Zero);
-
-	if (newLevel)
-	{
-		m_music.stop();
-		PlayMusic();
-	}
 }
 
 void CAudio::StopAll()
@@ -61,4 +55,7 @@ void CAudio::Process()
 		};
 
 	m_playingSounds.erase(std::remove_if(m_playingSounds.begin(), m_playingSounds.end(), process), m_playingSounds.end());
+
+	if (m_music.getStatus() == sf::Music::Stopped)
+		PlayMusic();
 }

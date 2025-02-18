@@ -23,7 +23,6 @@ class CGame
 public:
 	CGame();
 	void Start();
-	void Shutdown() const noexcept;
 
 	void Pause() noexcept { m_gameState = eGameState::PAUSED; }
 	void Resume() noexcept { m_gameState = eGameState::RUNNING; }
@@ -48,6 +47,7 @@ private:
 
 private:
 	sf::RenderWindow* m_gameWindow{ nullptr };
+	sf::Sprite* m_bgSprite{ nullptr };
 	std::unique_ptr<CResourceManager> m_resourceManager;
 	std::unique_ptr<CPaddle> m_paddle;
 	std::unique_ptr<CBalls> m_balls;

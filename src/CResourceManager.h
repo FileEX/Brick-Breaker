@@ -9,8 +9,6 @@ class CResourceManager
 public:
 	CResourceManager();
 
-	void Shutdown() noexcept { m_spritesMap.clear(); m_texturesMap.clear(); m_soundsBuffer.clear(); }
-
 	std::shared_ptr<sf::Sprite> GetSprite(const std::string& spriteName) const;
 	std::shared_ptr<sf::Texture> GetTexture(const std::string& textureName) const;
 	std::shared_ptr<sf::SoundBuffer> GetSoundBuffer(const std::string& soundName, bool canBeInvalid = false) const;
