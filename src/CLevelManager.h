@@ -16,10 +16,12 @@ public:
 	std::uint8_t GetLevel() const noexcept { return m_level; }
 
 	void SetLevelStatus(const eLevelStatus& status);
+	eLevelStatus GetLevelStatus() const noexcept { return m_status; }
 
-	void LoadLevel();
+	void LoadLevel(std::uint8_t level);
 	void ResetLevel();
 
+	void PreProcess() const;
 	void Process(bool gamePaused);
 
 private:
@@ -31,5 +33,8 @@ private:
 
 	sf::Text m_bigText;
 	sf::Text m_subText;
+
+	sf::Sprite m_levelBackground;
+	bool m_initalized{ false };
 };
 

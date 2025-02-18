@@ -8,6 +8,8 @@ class CBullets
 public:
 	CBullets(sf::RenderWindow* gameWindow, CBricks* bricks, CAudio* audio) : m_gameWindow(gameWindow), m_bricks(bricks), m_audio(audio) {}
 
+	void Shutdown() noexcept { m_bullets.clear(); }
+
 	void CreateBullet();
 	void RemoveBullets() const noexcept;
 

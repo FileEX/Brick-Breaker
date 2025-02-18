@@ -31,6 +31,7 @@ public:
 
 	void Reset(std::uint8_t level);
 
+	void Update() const;
 	void Process() const;
 
 private:
@@ -47,6 +48,8 @@ private:
 
 	sf::Text m_levelText;
 	sf::Text m_scoreText;
+
+	sf::Vector2f m_powerupsPos{};
 
 	bool m_fontLoaded{ false };
 };

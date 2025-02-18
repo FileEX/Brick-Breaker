@@ -18,6 +18,10 @@ public:
 	void SetGunActive(bool active) noexcept { m_gunActive = active; }
 	bool IsGunActive() const noexcept { return m_gunActive; }
 
+	void Freeze(bool freeze);
+	void Invert(bool invert);
+
+	void UpdateFrozenRect();
 	void UpdateScale(const sf::Vector2f& target) noexcept { m_scaleTarget = target; m_updateScale = true; }
 	void Process(bool gamePaused);
 
@@ -25,6 +29,7 @@ private:
 	sf::RenderWindow* m_gameWindow{ nullptr };
 	CHud* m_hud{ nullptr };
 	sf::Sprite* m_paddleSprite{ nullptr };
+	sf::RectangleShape m_frozenRect{};
 
 	sf::Sprite m_gunSprite_Left;
 	sf::Sprite m_gunSprite_Right;
@@ -35,4 +40,8 @@ private:
 	bool m_updateScale{ false };
 	bool m_isGlued{ false };
 	bool m_gunActive{ false };
+	bool m_frozen{ false };
+	bool m_inverted{ false };
+	float m_offset{ 0.0f };
+	float m_prevMouseX{ 0.0f };
 };

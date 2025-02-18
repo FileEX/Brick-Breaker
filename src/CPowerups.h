@@ -7,9 +7,12 @@ class CPowerups
 public:
 	CPowerups(sf::RenderWindow* gameWindow, sf::Sprite* paddleSprite, CBullets* bullets) : m_gameWindow(gameWindow), m_paddleSprite(paddleSprite), m_bullets(bullets) {}
 
+	void Shutdown() noexcept { m_powerups.clear(); }
+
 	void SpawnPowerup(const sf::Vector2f& pos);
 	void RemovePowerups() const noexcept;
-	CPowerup* GetPowerupByType(const ePowerupType& type, CPowerup* ignore = nullptr) const noexcept;
+	CPowerup* GetActivePowerupByType(const ePowerupType& type, CPowerup* ignore = nullptr) const noexcept;
+	std::vector<CPowerup*> GetActivePowerups() const;
 
 	void SetGunPowerupActive(bool active) noexcept { m_isActiveGunPowerup = active; }
 

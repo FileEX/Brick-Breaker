@@ -7,6 +7,8 @@ class CBricks
 public:
 	CBricks(sf::RenderWindow* gameWindow);
 
+	void Shutdown() noexcept { m_bricksList.clear(); }
+
 	void CreateBricks();
 	void RemoveBricks();
 	void DestroyBrick(CBrick* brick, bool reset = false);
@@ -18,7 +20,7 @@ public:
 	void Process() noexcept;
 
 private:
-	int GetBrickHealthFromColor(const sf::Color& color) const;
+	int GetHitsToDestroyFromColor(const sf::Color& color) const noexcept;
 	void GenerateLevelFileFromTemplate() const;
 
 private:
